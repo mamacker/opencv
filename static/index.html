@@ -1,0 +1,23 @@
+<html>
+<head>
+<head>
+  <meta charset="utf-8">
+  <script src="https://apis.google.com/_/scs/apps-static/_/js/k=oz.gapi.en.apoLPtmovAU.O/m=client/rt=j/sv=1/d=1/ed=1/am=AQ/rs=AGLTcCM-VL955562vd4AgQ2Ep4nC7BDm2Q/cb=gapi.loaded_0" async=""></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+  <script src="https://apis.google.com/js/client.js" gapi_processed="true"></script>
+  <script src="/static/socket.io.js"></script>
+  <script src="/static/socket.io-stream.js"></script>
+</head>
+<body>
+  Hi boys! Good morning!!!
+  <br>
+  This is the morning time.  I use it to play with code.
+  <img id='imgpic' src"">
+
+  <script>
+  var socket = io();
+  socket.on('newimg', (imgData) => {
+    $("#imgpic")[0].src = "data:" + imgData;
+  });
+  </script>
+</body>
+<html>

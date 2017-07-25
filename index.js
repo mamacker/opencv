@@ -12,15 +12,10 @@ var http = require('http').Server(app);
 
 app.use('/static', express.static('/home/pi/opencv/static'));
 app.get('/', function (req, res) {
-  res.sendFile('/home/pi/server/index.html');
+  res.sendFile('/home/pi/opencv/static/index.html');
 })
 
-app.listen(8080, function () {
-  console.log('App listening on port 8080!')
-})
-
-var http = require('http');
-http.createServer(app).listen(80);
+http.listen(80);
 var io = sio(http);
 io.on('connection', (socket) => {
   console.log("Someone connected.");
