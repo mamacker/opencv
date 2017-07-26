@@ -23,17 +23,18 @@ io.on('connection', (socket) => {
 
 emitter.on('facefound', (filename) => {
   var data = fs.readFile(filename, (err, data) => {
-    if (err) throw err;
-    var base64Data = data.toString('base64');
-    io.emit('newimg', "image/png;base64,"+base64Data);
+    if (!err) {
+      var base64Data = data.toString('base64');
+      io.emit('newimg', "image/png;base64,"+base64Data);
+    }
   });
 });
 
 var camera = new RaspiCam({
 	mode: "timelapse",
-	output: "./photo/image-%d.jpg",
+	output: "./ram/image-%04d.jpg",
 	encoding: "jpg",
-  timelapse: 500,
+  timelapse: 250,
 	timeout: 0 // take the picture immediately
 });
 
@@ -44,7 +45,7 @@ camera.on("start", function( err, timestamp ){
 camera.on("read", function( err, timestamp, filename ){
 	console.log("photo image captured with filename: " + filename );
   //Now load that photo into opencv
-  cv.readImage("/home/pi/opencv/photo/"+filename, function(err, im){
+  cv.readImage("/home/pi/opencv/ram/"+filename, function(err, im){
     if (err) throw err;
     if (im.width() < 1 || im.height() < 1) {
       console.log("Image has no size");
@@ -58,16 +59,32 @@ camera.on("read", function( err, timestamp, filename ){
         im.ellipse(face.x + face.width / 2, face.y + face.height / 2, face.width / 2, face.height / 2);
       }
 
-      var fileLocation = './tmp/face-detectObject.png';
+
+      var fileLocation = './ram/face-detectObject.png';
       im.save(fileLocation);
       emitter.emit('facefound', fileLocation);
-      console.log('Image saved to ./tmp/face-detection.png');
+      console.log('Image saved to ./ram/face-detection.png');
     });
   });
 });
+
 
 camera.on("exit", function( timestamp ){
 	console.log("photo child process has exited at " + timestamp );
 });
 
 camera.start();
+
+function cleanup() {
+  fs.readdir("/home/pi/opencv/ram/",(err, files) => {
+    if (files.length >= 100) {
+      console.log("Cleaning up files.");
+      files.forEach((file) => {
+        fs.unlink("/home/pi/opencv/ram/"+file);
+      });
+    }
+  })
+}
+
+setInterval(cleanup, 30000);
+
